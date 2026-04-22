@@ -1007,44 +1007,44 @@
           <div class="form-title">Quote Enquiry Form</div>
           <div class="form-lead">All fields marked * are required. Quotations are provided free of charge and are non-binding.</div>
 
-          <form id="quoteForm" onsubmit="submitForm(event)">
+          <form id="quoteForm" onsubmit="submitForm(event)" action="https://formspree.io/f/xqewgalj" method="POST">
             <div class="frow">
               <div class="fg">
                 <label>Full Name *</label>
-                <input type="text" placeholder="Jane Smith" required>
+                <input type="text" name="name" placeholder="Jane Smith" required>
               </div>
               <div class="fg">
                 <label>Company Name *</label>
-                <input type="text" placeholder="Acme Medical Ltd." required>
+                <input type="text" name="company" placeholder="Acme Medical Ltd." required>
               </div>
             </div>
             <div class="frow">
               <div class="fg">
                 <label>Email Address *</label>
-                <input type="email" placeholder="you@company.com" required>
+                <input type="email" name="email" placeholder="you@company.com" required>
               </div>
               <div class="fg">
                 <label>Phone Number</label>
-                <input type="tel" placeholder="+1 212 000 0000">
+                <input type="tel" name="phone" placeholder="+1 212 000 0000">
               </div>
             </div>
             <div class="fg">
               <label>Product Description *</label>
-              <textarea placeholder="Please describe the product(s) you require, including any specifications, standards, certifications, or regulatory requirements relevant to your destination country..." required></textarea>
+              <textarea name="product" placeholder="Please describe the product(s) you require, including any specifications, standards, certifications, or regulatory requirements relevant to your destination country..." required></textarea>
             </div>
             <div class="frow">
               <div class="fg">
                 <label>Estimated Quantity *</label>
-                <input type="text" placeholder="e.g. 10,000 units / 5 pallets" required>
+                <input type="text" name="quantity" placeholder="e.g. 10,000 units / 5 pallets" required>
               </div>
               <div class="fg">
                 <label>Destination Country *</label>
-                <input type="text" placeholder="e.g. United States, Germany" required>
+                <input type="text" name="destination" placeholder="e.g. United States, Germany" required>
               </div>
             </div>
             <div class="fg">
               <label>Preferred Shipping Mode</label>
-              <select>
+              <select name="shipping">
                 <option value="">— Select if known —</option>
                 <option>Air Freight</option>
                 <option>Sea Freight</option>
@@ -1055,13 +1055,13 @@
             </div>
             <div class="fg">
               <label>Additional Information</label>
-              <textarea placeholder="Any other details that may help us prepare your quote — timeline, budget, previous orders, etc." style="min-height:76px;"></textarea>
+              <textarea name="notes" placeholder="Any other details that may help us prepare your quote — timeline, budget, previous orders, etc." style="min-height:76px;"></textarea>
             </div>
             <div class="consent">
               <input type="checkbox" required>
               <span>I confirm I have read and agree to the <a onclick="show('privacy')">Privacy Policy</a> and <a onclick="show('terms')">Terms &amp; Conditions</a>. I understand that all orders are quote-based only, that there are strictly no returns or refunds, and that payment is 50% on order confirmation and 50% plus shipping on dispatch. *</span>
             </div>
-            <button type="submit" class="btn-submit">Submit Quote Request &rarr;</button>
+            <button type="submit" class="btn-submit" id="submitBtn">Submit Quote Request &rarr;</button>
           </form>
 
           <div class="form-success" id="formSuccess">
@@ -1177,10 +1177,31 @@
     document.getElementById('mobileNav').classList.toggle('open');
   }
 
-  function submitForm(e) {
+  async function submitForm(e) {
     e.preventDefault();
-    document.getElementById('quoteForm').style.display = 'none';
-    document.getElementById('formSuccess').classList.add('show');
+    const form = document.getElementById('quoteForm');
+    const btn  = document.getElementById('submitBtn');
+    btn.textContent = 'Sending…';
+    btn.disabled = true;
+    try {
+      const res = await fetch('https://formspree.io/f/xqewgalj', {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        form.style.display = 'none';
+        document.getElementById('formSuccess').classList.add('show');
+      } else {
+        btn.textContent = 'Submit Quote Request →';
+        btn.disabled = false;
+        alert('Something went wrong. Please email us directly at hello@moishifraenterprises.com');
+      }
+    } catch {
+      btn.textContent = 'Submit Quote Request →';
+      btn.disabled = false;
+      alert('Something went wrong. Please email us directly at hello@moishifraenterprises.com');
+    }
   }
 
   document.querySelectorAll('.toc a[href^="#"]').forEach(link => {
